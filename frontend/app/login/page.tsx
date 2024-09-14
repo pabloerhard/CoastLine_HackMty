@@ -28,9 +28,9 @@ export default function Component() {
       <Card className="w-full max-w-md bg-black text-white">
         <CardHeader>
           <Logo />
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+          <CardTitle className="text-2xl font-bold">Inicia sesión</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account
+            Ingresa tus credenciales para acceder a tu cuenta
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -77,7 +77,7 @@ export default function Component() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button className="w-full" type="submit">
-            Log in
+            Ingresar
           </Button>
           <div className="text-sm text-center text-gray-500">
             ¿No tienes cuenta?{" "}

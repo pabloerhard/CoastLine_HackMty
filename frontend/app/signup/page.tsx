@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import Logo from "@/components/logo/Logo";
 
 export default function Component() {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,9 +27,10 @@ export default function Component() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-black text-white">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+          <Logo />
+          <CardTitle className="text-2xl font-bold">Crea tu cuenta</CardTitle>
           <CardDescription>
-            Enter your credentials to access your account
+            Ingresa tus datos para crear una cuenta
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -75,7 +77,7 @@ export default function Component() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button className="w-full" type="submit">
-            Log in
+            Registrarte
           </Button>
           <div className="text-sm text-center text-gray-500">
             ¿Ya tienes cuenta?{" "}
