@@ -15,12 +15,21 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import Logo from "@/components/logo/Logo";
+import { signInWithEmailAndPassword } from "@/lib/firebase/auth";
 
 export default function Component() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    const response = await signInWithEmailAndPassword(email, password);
+    console.log(response);
   };
 
   return (
@@ -34,13 +43,15 @@ export default function Component() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Correo</Label>
                 <Input
                   id="email"
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="nombre@ejemplo.com"
                   required
                 />
@@ -50,6 +61,8 @@ export default function Component() {
                 <div className="relative">
                   <Input
                     id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     type={showPassword ? "text" : "password"}
                     placeholder="Ingresa tu contraseña"
                     required
@@ -72,13 +85,13 @@ export default function Component() {
                   </Button>
                 </div>
               </div>
+              <Button className="w-full" type="submit" onClick={handleSubmit}>
+                Registrarte
+              </Button>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full" type="submit">
-            Registrarte
-          </Button>
           <div className="text-sm text-center text-gray-500">
             ¿Ya tienes cuenta?{" "}
             <Link href="/login" className="text-blue-500 hover:underline">
