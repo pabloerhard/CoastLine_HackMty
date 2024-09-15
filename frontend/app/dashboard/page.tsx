@@ -30,6 +30,11 @@ const incomeData = [
   { month: "Niñero", desktop: 100, mobile: 120 },
 ];
 
+const mainNumbers = {
+  totalExpenses: 4857.12,
+  totalIncome: 6785.02,
+};
+
 const chartConfig = {
   desktop: {
     label: "Desktop",
@@ -53,6 +58,13 @@ export default function Dashboard() {
 
   return (
     <div>
+      {/* Note on current situation */}
+      <h2 className="flex justify-center p-4 text-white font-bold text-2xl">
+        {mainNumbers.totalIncome - mainNumbers.totalIncome < 500
+          ? "You are covered."
+          : "Action is required."}
+      </h2>
+
       {/* Financial Status */}
       <section className="flex flex-row justify-between gap-2">
         <div className="w-[100%] flex flex-col gap-2">
@@ -64,7 +76,7 @@ export default function Dashboard() {
           </Button>
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle className="text-red-200">$4,857.00</CardTitle>
+              <CardTitle className="text-red-200">{`$ ${mainNumbers.totalExpenses}`}</CardTitle>
               <CardDescription>MXN</CardDescription>
             </CardHeader>
           </Card>
@@ -78,16 +90,18 @@ export default function Dashboard() {
           </Button>
           <Card className="bg-background">
             <CardHeader>
-              <CardTitle className="text-green-200">$6,785.00</CardTitle>
+              <CardTitle className="text-green-200">{`$ ${mainNumbers.totalIncome}`}</CardTitle>
               <CardDescription>MXN</CardDescription>
             </CardHeader>
           </Card>
         </div>
       </section>
 
+      <br />
+
       {/* Note on current situation */}
       <h2 className="flex justify-center p-4 text-white font-bold text-2xl">
-        You are covered.
+        Your monthly expenses
       </h2>
 
       {/* Chart Section */}
