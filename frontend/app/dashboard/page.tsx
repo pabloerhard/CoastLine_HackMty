@@ -55,7 +55,7 @@ export default function Dashboard() {
     <div>
       {/* Financial Status */}
       <section className="flex flex-row justify-between gap-2">
-        <div className="w-[100%] flex flex-col">
+        <div className="w-[100%] flex flex-col gap-2">
           <Button
             className={`flex ${isExpense ? "bg-[#27272b]" : "bg-black"}`}
             onClick={toggleChart}
@@ -69,7 +69,7 @@ export default function Dashboard() {
             </CardHeader>
           </Card>
         </div>
-        <div className="w-[100%] flex flex-col">
+        <div className="w-[100%] flex flex-col gap-2">
           <Button
             className={`flex ${!isExpense ? "bg-[#27272b]" : "bg-black"}`}
             onClick={toggleChart}
