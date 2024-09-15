@@ -18,22 +18,25 @@ import Logo from "@/components/logo/Logo";
 import { auth } from "@/lib/firebase/client";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import Loader from "@/components/loader/Loader";
 
 export default function Component() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [user, loading] = useAuthState(auth);
+
+  if (loading) {
+    return <Loader />;
+  } else if (user) {
+    router.push("/dashboard");
+  }
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  useEffect(() => {
-    if (auth.currentUser) {
-      router.push("/dashboard");
-    }
-  }, []);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -98,10 +101,10 @@ export default function Component() {
                     )}
                   </Button>
                 </div>
-                <Button className="w-full" onClick={handleSubmit}>
-                  Ingresar
-                </Button>
               </div>
+              <Button className="w-full" onClick={handleSubmit}>
+                Ingresar
+              </Button>
             </div>
           </form>
         </CardContent>

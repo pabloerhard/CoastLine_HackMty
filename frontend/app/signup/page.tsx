@@ -16,6 +16,8 @@ import {
 import Link from "next/link";
 import Logo from "@/components/logo/Logo";
 import { signInWithEmailAndPassword } from "@/lib/firebase/auth";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 export default function Component() {
   const [email, setEmail] = useState("");
@@ -28,12 +30,19 @@ export default function Component() {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    const response = await signInWithEmailAndPassword(email, password);
-    console.log(response);
+    try {
+      await signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      toast.error("Error al crear el usuario", {
+        position: "top-center",
+        duration: 5000,
+      });
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
+      <Toaster className="bg-black" />
       <Card className="w-full max-w-md bg-black text-white">
         <CardHeader>
           <Logo />
