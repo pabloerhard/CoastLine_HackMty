@@ -6,16 +6,16 @@ const currentIncome = new Income("0rx4gtLik4TScOJb6JHorZJ6iqf2");
 const incomeHistory = new IncomeHistory("0rx4gtLik4TScOJb6JHorZJ6iqf2");
 const expenses = new Expenses("0rx4gtLik4TScOJb6JHorZJ6iqf2");
 // example incomes
-// const incomes = [
-//     {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'oneTime', startDate: '2024-06-15', endDate: '2024-06-15', amount: 1000 },
-//     {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'monthly', startDate: '2024-05-01', endDate: '2024-08-01', amount: 1000 },
-//     {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'biweekly', startDate: '2024-08-01', endDate: null, amount: 1000 },
-//     {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'weekly', startDate: '2024-09-10', endDate: null, amount: 10000 },
-//   ];
+const incomes = [
+    {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'oneTime', startDate: '2024-06-15', endDate: '2024-06-15', amount: 1000, category: 'Capital one paycheck' },
+    {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'monthly', startDate: '2024-05-01', endDate: '2024-08-01', amount: 3500, category: 'Capital one bonus' },
+    {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'biweekly', startDate: '2024-08-01', endDate: null, amount: 2000, category: 'Freelance work' },
+    {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'weekly', startDate: '2024-09-10', endDate: null, amount: 100, category: 'Tutoring' },
+  ];
 
-//   for (const income of incomes) {
-//     await currentIncome.create(currentIncome.collection, income);
-//   }
+  for (const income of incomes) {
+    await currentIncome.create(currentIncome.collection, income);
+  }
 
 // console.log(await currentIncome.listActiveIncomes('2024-09-01', '2024-09-30'));
 
@@ -78,4 +78,4 @@ const expenses = new Expenses("0rx4gtLik4TScOJb6JHorZJ6iqf2");
 //     await expenses.create(expenses.collection, exp);
 //   }
 
-console.log(await expenses.listActiveExpenses("2024-08-01", "2024-10-30"));
+// console.log(await expenses.listActiveExpenses("2024-08-01", "2024-10-30"));

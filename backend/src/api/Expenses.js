@@ -56,6 +56,7 @@ export default class Expenses extends CRUD {
         const listExpenses = [];
 
         list.forEach((expense) => {
+            expense.categoryNumber = this.carbonFootprintScores[expense.category];
             if (this.isExpenseValid(expense, new Date(startDate), new Date(endDate))) {
                 expense.amount = parseFloat(expense.amount);
                 listExpenses.push(expense);
