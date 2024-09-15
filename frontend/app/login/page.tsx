@@ -50,8 +50,8 @@ export default function Component() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-black text-white">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white text-black">
         <CardHeader>
           <Logo />
           <CardTitle className="text-2xl font-bold">Inicia sesión</CardTitle>

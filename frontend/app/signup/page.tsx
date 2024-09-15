@@ -41,9 +41,9 @@ export default function Component() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="bg-gray-100 min-h-screen flex items-center justify-center p-4">
       <Toaster className="bg-black" />
-      <Card className="w-full max-w-md bg-black text-white">
+      <Card className="w-full max-w-md bg-white text-black">
         <CardHeader>
           <Logo />
           <CardTitle className="text-2xl font-bold">Crea tu cuenta</CardTitle>

@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import dotenv from 'dotenv';
+import { initializeFirestore } from "firebase/firestore";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -17,7 +18,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore
-const db = getFirestore(app);
-
+// Initialize Firestore with settings
+const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 export { db };

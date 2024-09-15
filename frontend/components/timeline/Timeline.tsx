@@ -1,20 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   addMonths,
   differenceInCalendarMonths,
   differenceInMonths,
   differenceInDays,
 } from "date-fns";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase/client";
 
 type Expense = {
   id: string;
-  amount: number;
-  date: Date;
-  endDate: Date;
-  description: string;
+  payDate: string;
   category: string;
+  alerted: boolean;
+  amount: number;
+  dueDate: string;
+  userId: string;
 };
 
 const getLengthOfExpense = (
@@ -55,27 +58,73 @@ const getLeftOfExpense = (startDate: Date, minDate: Date) => {
   return diff;
 };
 
-export default function Timeline({ expenses }: { expenses: Expense[] }) {
+export default function Timeline() {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [user, loading, error] = useAuthState(auth);
   const [width, setWidth] = useState(20);
   const [startDate, setStartDate] = useState<Date | null>(new Date(2024, 8));
   const [endDate, setEndDate] = useState<Date | null>(new Date(2024, 11, 0));
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      console.log(user?.uid);
+      if (!user) return;
+      try {
+        const response = await fetch(
+          "http://10.22.157.83:3000/expenses/listActiveExpenses",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: "0rx4gtLik4TScOJb6JHorZJ6iqf2",
+              startDate: "2024-09-01",
+              endDate: "2024-09-30",
+            }),
+          }
+        ).then((res) => res.json());
+        setExpenses(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (!loading && user) {
+      fetchExpenses();
+    }
+  }, [loading]);
+
   let months = [];
+  let borders = [];
+  let index = 1;
   if (startDate && endDate) {
     let tempStart = startDate;
     while (tempStart <= endDate) {
       months.push(
-        <div key={tempStart.toISOString()} style={{ width: `${width}rem` }}>
-          <p className="text-lg font-semibold border-r border-white">
+        <div
+          key={tempStart.toISOString()}
+          className="bg-black"
+          style={{ width: `${width}rem` }}
+        >
+          <p className="py-3 flex justify-center text-lg font-semibold">
             {tempStart.toLocaleString("default", { month: "short" })}
           </p>
         </div>
       );
+      borders.push(
+        <div
+          style={{ left: `${index * width}rem` }}
+          className="absolute h-full w-0.5 z-10 bg-white"
+        ></div>
+      );
+      index++;
       tempStart = addMonths(tempStart, 1);
     }
   }
 
   return (
-    <div className="h-60 w-full overflow-auto p-5 space-y-3">
+    <div className="h-60 w-full overflow-auto space-y-3 relative">
       {startDate && endDate ? (
         <>
           <div
@@ -84,7 +133,7 @@ export default function Timeline({ expenses }: { expenses: Expense[] }) {
                 (differenceInCalendarMonths(endDate, startDate) + 1) * width
               }rem`,
             }}
-            className="flex justify-center"
+            className="flex justify-center sticky top-0 z-30 bg-black"
           >
             {months}
           </div>
@@ -101,22 +150,23 @@ export default function Timeline({ expenses }: { expenses: Expense[] }) {
               >
                 <div
                   key={expense.id}
-                  className="rounded-md absolute flex items-center h-10 bg-white text-black"
+                  className="z-20 rounded-md absolute top-1/2 -translate-y-1/2 flex items-center h-10 bg-white text-black"
                   style={{
                     width: `${
                       getLengthOfExpense(
-                        expense.date,
-                        expense.endDate,
+                        new Date(expense.payDate),
+                        new Date(expense.dueDate),
                         startDate,
                         endDate
                       ) * width
                     }rem`,
                     left: `${
-                      getLeftOfExpense(expense.date, startDate) * width
+                      getLeftOfExpense(new Date(expense.payDate), startDate) *
+                      width
                     }rem`,
                   }}
                 >
-                  <p className="">{expense.description}</p>
+                  <p className="">{expense.category}</p>
                 </div>
               </div>
             );
