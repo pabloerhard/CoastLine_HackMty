@@ -1,10 +1,10 @@
-import Income from './Income.js';
-import Expenses from './Expenses.js';
-import IncomeHistory from './IncomeHistory.js';
+import Income from "./Income.js";
+import Expenses from "./Expenses.js";
+import IncomeHistory from "./IncomeHistory.js";
 
-const currentIncome = new Income('0rx4gtLik4TScOJb6JHorZJ6iqf2');
-const incomeHistory = new IncomeHistory('0rx4gtLik4TScOJb6JHorZJ6iqf2');
-const expenses= new Expenses('0rx4gtLik4TScOJb6JHorZJ6iqf2');
+const currentIncome = new Income("0rx4gtLik4TScOJb6JHorZJ6iqf2");
+const incomeHistory = new IncomeHistory("0rx4gtLik4TScOJb6JHorZJ6iqf2");
+const expenses = new Expenses("0rx4gtLik4TScOJb6JHorZJ6iqf2");
 // example incomes
 // const incomes = [
 //     {userId:"0rx4gtLik4TScOJb6JHorZJ6iqf2", frequency: 'oneTime', startDate: '2024-06-15', endDate: '2024-06-15', amount: 1000 },
@@ -78,4 +78,4 @@ const expenses= new Expenses('0rx4gtLik4TScOJb6JHorZJ6iqf2');
 //     await expenses.create(expenses.collection, exp);
 //   }
 
-//console.log(await expenses.listActiveExpenses('2024-01-01', '2024-01-30'));
+console.log(await expenses.listActiveExpenses("2024-08-01", "2024-10-30"));
