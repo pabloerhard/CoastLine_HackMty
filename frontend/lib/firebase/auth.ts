@@ -31,6 +31,7 @@ export async function signInWithEmailAndPassword(
     return createUserWithEmailAndPassword(auth, email, password);
   } catch (error) {
     console.error("Error signing in with email and password", error);
+    return error;
   }
 }
 
