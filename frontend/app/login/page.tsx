@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,12 +15,35 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import Logo from "@/components/logo/Logo";
+import { auth } from "@/lib/firebase/client";
+import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function Component() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      router.push("/dashboard");
+    }
+  }, []);
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error signing in with email and password", error);
+    }
   };
 
   return (
@@ -41,6 +64,8 @@ export default function Component() {
                 <Input
                   id="email"
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="nombre@ejemplo.com"
                   required
                 />
@@ -51,6 +76,8 @@ export default function Component() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="Ingresa tu contraseña"
                     required
                   />
@@ -71,14 +98,14 @@ export default function Component() {
                     )}
                   </Button>
                 </div>
+                <Button className="w-full" onClick={handleSubmit}>
+                  Ingresar
+                </Button>
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full" type="submit">
-            Ingresar
-          </Button>
           <div className="text-sm text-center text-gray-500">
             ¿No tienes cuenta?{" "}
             <Link href="/signup" className="text-blue-500 hover:underline">
