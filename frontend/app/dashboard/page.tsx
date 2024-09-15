@@ -36,6 +36,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { set } from "date-fns";
 
 interface Message {
   sender: "user" | "ai";
@@ -148,9 +149,16 @@ export default function Dashboard() {
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
   const [expenses, setExpenses] = useState<
-    { id: string; category: string; date: string; amount: number }[]
+    {
+      id: string;
+      category: string;
+      date: string;
+      amount: number;
+      categoryNumber: number;
+    }[]
   >([]);
   const [expenseTotal, setExpenseTotal] = useState(0);
+  const [incomeTotal, setIncomeTotal] = useState(0);
   const [totalToShow, setTotalToShow] = useState(0);
   const [openAddExpenseModal, setOpenAddExpenseModal] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
@@ -158,6 +166,14 @@ export default function Dashboard() {
     [key: string]: {
       amount: number;
       percent: number;
+      label: string;
+      category: string;
+      carbonFootprint: number;
+    };
+  }>(null);
+  const [incomeData, setIncomeData] = useState<null | {
+    [key: string]: {
+      amount: number;
       label: string;
       category: string;
     };
@@ -180,7 +196,7 @@ export default function Dashboard() {
 
     try {
       // Send user's message to the backend API
-      const response = await fetch("http://localhost:3000/chatbot", {
+      const response = await fetch("http://10.22.157.83:3000/chatbot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -220,6 +236,11 @@ export default function Dashboard() {
     }
   };
 
+  const handleSectionChange = (section: string) => {
+    setSection(section);
+    setTotalToShow(section === "expenses" ? expenseTotal : incomeTotal);
+  };
+
   useEffect(() => {
     const fetchExpenses = async () => {
       console.log(user?.uid);
@@ -239,6 +260,23 @@ export default function Dashboard() {
             }),
           }
         ).then((res) => res.json());
+        console.log("first");
+        const incomeResponse = await fetch(
+          "http://10.22.157.83:3000/income/listActiveIncomes",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: "0rx4gtLik4TScOJb6JHorZJ6iqf2",
+              startDate: "2024-09-01",
+              endDate: "2024-09-30",
+            }),
+          }
+        ).then((res) => res.json());
+        console.log(incomeResponse);
+
         let total = 0;
         const graphData: {
           [key: string]: {
@@ -246,32 +284,64 @@ export default function Dashboard() {
             percent: number;
             label: string;
             category: string;
+            carbonFootprint: number;
           };
         } = {};
-        response.forEach((expense: { category: string; amount: number }) => {
-          console.log(expense);
-          total = total + expense.amount;
-          if (graphData[expense.category]) {
-            graphData[expense.category] = {
-              amount: graphData[expense.category].amount + expense.amount,
-              percent: 0,
-              label: expense.category,
-              category: expense.category,
-            };
-          } else {
-            graphData[expense.category] = {
-              amount: expense.amount,
-              percent: 0,
-              label: expense.category,
-              category: expense.category,
+
+        const incomeData: {
+          [key: string]: {
+            amount: number;
+            label: string;
+            category: string;
+          };
+        } = {};
+
+        response.forEach(
+          (expense: {
+            category: string;
+            amount: number;
+            categoryNumber: number;
+          }) => {
+            console.log(expense);
+            total = total + expense.amount;
+            if (graphData[expense.category]) {
+              graphData[expense.category] = {
+                amount: graphData[expense.category].amount + expense.amount,
+                percent: 0,
+                label: expense.category,
+                category: expense.category,
+                carbonFootprint: expense.categoryNumber,
+              };
+            } else {
+              graphData[expense.category] = {
+                amount: expense.amount,
+                percent: 0,
+                label: expense.category,
+                category: expense.category,
+                carbonFootprint: expense.categoryNumber,
+              };
+            }
+          }
+        );
+        let totalIncome = 0;
+
+        incomeResponse.forEach(
+          (income: { category: string; amount: number }) => {
+            totalIncome = totalIncome + income.amount;
+            incomeData[income.category] = {
+              amount: income.amount,
+              label: income.category,
+              category: income.category,
             };
           }
-        });
+        );
         for (const [key, value] of Object.entries(graphData)) {
           const percent = (value.amount / total) * 100;
           value.percent = Number((Math.round(percent * 100) / 100).toFixed(1));
         }
         setGraphData(graphData);
+        setIncomeTotal(totalIncome);
+        setIncomeData(incomeData);
         setExpenseTotal(total);
         setTotalToShow(total);
         setExpenses(response);
@@ -311,6 +381,7 @@ export default function Dashboard() {
           category: expense.category,
           date: new Date().toISOString(),
           amount: expense.amount,
+          categoryNumber: 0,
         },
       ];
       setExpenses(newExpenses);
@@ -323,26 +394,35 @@ export default function Dashboard() {
           percent: number;
           label: string;
           category: string;
+          carbonFootprint: number;
         };
       } = {};
-      newExpenses.forEach((expense: { category: string; amount: number }) => {
-        total = total + expense.amount;
-        if (graphData[expense.category]) {
-          graphData[expense.category] = {
-            amount: graphData[expense.category].amount + expense.amount,
-            percent: 0,
-            label: expense.category,
-            category: expense.category,
-          };
-        } else {
-          graphData[expense.category] = {
-            amount: expense.amount,
-            percent: 0,
-            label: expense.category,
-            category: expense.category,
-          };
+      newExpenses.forEach(
+        (expense: {
+          category: string;
+          amount: number;
+          categoryNumber: number;
+        }) => {
+          total = total + expense.amount;
+          if (graphData[expense.category]) {
+            graphData[expense.category] = {
+              amount: graphData[expense.category].amount + expense.amount,
+              percent: 0,
+              label: expense.category,
+              category: expense.category,
+              carbonFootprint: expense.categoryNumber,
+            };
+          } else {
+            graphData[expense.category] = {
+              amount: expense.amount,
+              percent: 0,
+              label: expense.category,
+              category: expense.category,
+              carbonFootprint: expense.categoryNumber,
+            };
+          }
         }
-      });
+      );
       for (const [key, value] of Object.entries(graphData)) {
         const percent = (value.amount / total) * 100;
         value.percent = Number((Math.round(percent * 100) / 100).toFixed(1));
@@ -352,6 +432,7 @@ export default function Dashboard() {
       console.log(error);
     }
   };
+  console.log(incomeData);
   return (
     <div className="py-5 px-3.5 flex justify-center">
       <Drawer>
@@ -359,7 +440,9 @@ export default function Dashboard() {
           <header className="w-full flex flex-col items-center justify-center gap-3">
             <div className="flex flex-col items-center justify-center">
               <h3 className="font-bold text-xl leading-none">${totalToShow}</h3>
-              <p className="text-sm text-gray-500">Total</p>
+              <p className="text-sm text-gray-500">
+                Total {section === "expenses" ? "Expenses" : "Income"}
+              </p>
             </div>
             <div className="flex w-full items-center justify-between">
               <div className="inline-flex bg-gray-200 rounded-full">
@@ -368,7 +451,7 @@ export default function Dashboard() {
                     "px-6 py-1.5 rounded-full",
                     section === "expenses" ? "bg-black text-white" : ""
                   )}
-                  onClick={() => setSection("expenses")}
+                  onClick={() => handleSectionChange("expenses")}
                 >
                   Expenses
                 </button>
@@ -377,7 +460,7 @@ export default function Dashboard() {
                     "px-6 py-1.5 rounded-full",
                     section === "income" ? "bg-black text-white" : ""
                   )}
-                  onClick={() => setSection("income")}
+                  onClick={() => handleSectionChange("income")}
                 >
                   Income
                 </button>
@@ -388,12 +471,19 @@ export default function Dashboard() {
             </div>
           </header>
           <section className="w-full flex items-center justify-center">
-            {graphData && (
+            {graphData && incomeData ? (
               <ChartContainer
                 config={chartConfig}
                 className="w-full lg:w-[1200px]"
               >
-                <BarChart accessibilityLayer data={Object.values(graphData)}>
+                <BarChart
+                  accessibilityLayer
+                  data={
+                    section === "expenses"
+                      ? Object.values(graphData)
+                      : Object.values(incomeData)
+                  }
+                >
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="label"
@@ -415,7 +505,7 @@ export default function Dashboard() {
                     }
                   />
                   <Bar
-                    dataKey="percent"
+                    dataKey={section === "expenses" ? "percent" : "amount"}
                     strokeWidth={2}
                     radius={8}
                     activeIndex={2}
@@ -433,7 +523,7 @@ export default function Dashboard() {
                   />
                 </BarChart>
               </ChartContainer>
-            )}
+            ) : null}
           </section>
           <section className="w-full">
             <div className="flex items-center justify-between">
@@ -449,13 +539,40 @@ export default function Dashboard() {
                       className="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm"
                     >
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`bg-gray-500 h-10 w-10 rounded-full`}
-                        ></div>
+                        {expense.carbonFootprint === 0 && (
+                          <div
+                            className={`bg-green-500 h-10 w-10 rounded-full`}
+                          ></div>
+                        )}
+                        {expense.carbonFootprint === 1 && (
+                          <div
+                            className={`bg-green-400 h-10 w-10 rounded-full`}
+                          ></div>
+                        )}
+                        {expense.carbonFootprint === 2 && (
+                          <div
+                            className={`bg-green-300 h-10 w-10 rounded-full`}
+                          ></div>
+                        )}
+                        {expense.carbonFootprint === 3 && (
+                          <div
+                            className={`bg-green-200 h-10 w-10 rounded-full`}
+                          ></div>
+                        )}
+                        {expense.carbonFootprint === 4 && (
+                          <div
+                            className={`bg-green-100 h-10 w-10 rounded-full`}
+                          ></div>
+                        )}
+                        {expense.carbonFootprint === 5 && (
+                          <div
+                            className={`bg-red-400 h-10 w-10 rounded-full`}
+                          ></div>
+                        )}
                         <div>
                           <p className="font-semibold">{expense.category}</p>
-                          <p className="text-sm text-gray-500">
-                            {expense.category}
+                          <p className={`text-sm text-gray-500`}>
+                            Huella de carbono {expense.carbonFootprint}
                           </p>
                         </div>
                       </div>
