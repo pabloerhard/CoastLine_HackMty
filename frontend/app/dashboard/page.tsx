@@ -251,12 +251,21 @@ export default function Dashboard() {
         response.forEach((expense: { category: string; amount: number }) => {
           console.log(expense);
           total = total + expense.amount;
-          graphData[expense.category] = {
-            amount: expense.amount,
-            percent: 0,
-            label: expense.category,
-            category: expense.category,
-          };
+          if (graphData[expense.category]) {
+            graphData[expense.category] = {
+              amount: graphData[expense.category].amount + expense.amount,
+              percent: 0,
+              label: expense.category,
+              category: expense.category,
+            };
+          } else {
+            graphData[expense.category] = {
+              amount: expense.amount,
+              percent: 0,
+              label: expense.category,
+              category: expense.category,
+            };
+          }
         });
         for (const [key, value] of Object.entries(graphData)) {
           const percent = (value.amount / total) * 100;
@@ -293,46 +302,56 @@ export default function Dashboard() {
           payDate: new Date().toISOString(),
           dueDate: new Date().toISOString(),
         }),
-      }).then((res) => res.json());
+      }).then((res) => res.text());
 
-      setExpenses((prev) => [
-        ...prev,
+      const newExpenses = [
+        ...expenses,
         {
           id: response,
           category: expense.category,
           date: new Date().toISOString(),
           amount: expense.amount,
         },
-      ]);
+      ];
+      setExpenses(newExpenses);
       setExpenseTotal((prev) => prev + expense.amount);
-      setTotalToShow((prev) => prev + expense.amount);
-      setGraphData((prev) => {
-        const newGraphData = { ...prev };
-        if (newGraphData[expense.category]) {
-          newGraphData[expense.category].amount =
-            newGraphData[expense.category].amount + expense.amount;
-          const percent =
-            (newGraphData[expense.category].amount / expenseTotal) * 100;
-          newGraphData[expense.category].percent = Number(
-            (Math.round(percent * 100) / 100).toFixed(1)
-          );
+      setTotalToShow(expenseTotal + expense.amount);
+      let total = 0;
+      const graphData: {
+        [key: string]: {
+          amount: number;
+          percent: number;
+          label: string;
+          category: string;
+        };
+      } = {};
+      newExpenses.forEach((expense: { category: string; amount: number }) => {
+        total = total + expense.amount;
+        if (graphData[expense.category]) {
+          graphData[expense.category] = {
+            amount: graphData[expense.category].amount + expense.amount,
+            percent: 0,
+            label: expense.category,
+            category: expense.category,
+          };
         } else {
-          newGraphData[expense.category] = {
+          graphData[expense.category] = {
             amount: expense.amount,
             percent: 0,
             label: expense.category,
             category: expense.category,
           };
         }
-        console.log(newGraphData);
-        // window.location.reload();
-        return newGraphData;
       });
+      for (const [key, value] of Object.entries(graphData)) {
+        const percent = (value.amount / total) * 100;
+        value.percent = Number((Math.round(percent * 100) / 100).toFixed(1));
+      }
+      setGraphData(graphData);
     } catch (error) {
       console.log(error);
     }
   };
-
   return (
     <div className="py-5 px-3.5 flex justify-center">
       <Drawer>
@@ -372,7 +391,7 @@ export default function Dashboard() {
             {graphData && (
               <ChartContainer
                 config={chartConfig}
-                className="w-full lg:w-[600px]"
+                className="w-full lg:w-[1200px]"
               >
                 <BarChart accessibilityLayer data={Object.values(graphData)}>
                   <CartesianGrid vertical={false} />
